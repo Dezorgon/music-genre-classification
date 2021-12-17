@@ -1,3 +1,4 @@
+import time
 import tensorflow as tf
 import tensorflow.keras as keras
 import numpy as np
@@ -51,8 +52,20 @@ if __name__ == "__main__":
     history = model.fit(x_train, y_train, validation_data=(x_val, y_val), batch_size=64, epochs=500)
 
     test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
+
     print('\ntest:', test_acc)
 
-    plot(history)
+
+    class TimeCallback(keras.callbacks.Callback):
+        def on_predict_begin(self, logs=None):
+            self.start_time = time.time()
+
+        def on_predict_end(self, logs=None):
+            print(f"{time.time() - self.start_time} seconds")
+
+
+    model.predict(x_test, callbacks=[TimeCallback()])
+
+    # plot(history)
 
 
